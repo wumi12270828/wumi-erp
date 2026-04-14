@@ -242,12 +242,26 @@
         <div class="card-title">報價紀錄</div>
         <div id="historyWrap"></div>
       </div>
+
+      <div class="card">
+        <div class="card-title">品項管理</div>
+        <div class="grid-3" style="margin-bottom:10px;">
+          <input id="newCategory" placeholder="大分類，例如：校園佈置" />
+          <input id="newProduct" placeholder="細項，例如：PVC" />
+          <input id="newPrice" placeholder="價格，例如：500" />
+        </div>
+        <div class="row" style="margin-bottom:12px;">
+          <button class="btn primary" id="addProductBtn">新增品項</button>
+          <button class="btn ghost" id="resetProductsBtn">恢復預設品項</button>
+        </div>
+        <div id="productManageWrap"></div>
+      </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
-    const priceTable = {
+    const defaultPriceTable = {
       PVC: 500,
       PP: 400,
       合成板: 800,
@@ -259,12 +273,15 @@
       '施工': 2000
     };
 
-    const categoryOptions = {
+    const defaultCategoryOptions = {
       校園佈置: ['PVC', 'PP', '合成板'],
       商業廣告: ['店卡', 'DM'],
       會場佈置: ['PVC裱合成板', '割型'],
       婚禮佈置: ['設計', '施工']
     };
+
+    let priceTable = JSON.parse(localStorage.getItem('wumi_price_table') || 'null') || { ...defaultPriceTable };
+    let categoryOptions = JSON.parse(localStorage.getItem('wumi_category_options') || 'null') || { ...defaultCategoryOptions };
 
     const state = {
       mode: '業務',
@@ -304,6 +321,8 @@
 
     function saveLocal() {
       localStorage.setItem('wumi_quotes', JSON.stringify(state.quotes));
+      localStorage.setItem('wumi_price_table', JSON.stringify(priceTable));
+      localStorage.setItem('wumi_category_options', JSON.stringify(categoryOptions));
     }
 
     function renderItems() {
@@ -419,6 +438,52 @@
       });
     }
 
+    function renderProductManager() {
+      const wrap = document.getElementById('productManageWrap');
+      if (!wrap) return;
+      const rows = [];
+      Object.keys(categoryOptions).forEach(category => {
+        (categoryOptions[category] || []).forEach(product => {
+          rows.push({ category, product, price: priceTable[product] || 0 });
+        });
+      });
+
+      wrap.innerHTML = rows.length ? '' : '<div class="muted">目前沒有品項</div>';
+
+      rows.forEach(rowData => {
+        const row = document.createElement('div');
+        row.className = 'history-row';
+        row.innerHTML = `
+          <div style="flex:1;">
+            <div class="strong">${rowData.product}</div>
+            <div class="muted">${rowData.category}</div>
+          </div>
+          <div class="row" style="align-items:center;">
+            <input value="${rowData.price}" data-role="price" style="width:100px;" />
+            <button class="btn sm" data-role="save">儲存</button>
+            <button class="btn sm ghost" data-role="delete">刪除</button>
+          </div>
+        `;
+
+        row.querySelector('[data-role="save"]').addEventListener('click', () => {
+          const nextPrice = Number(row.querySelector('[data-role="price"]').value) || 0;
+          priceTable[rowData.product] = nextPrice;
+          saveLocal();
+          renderAll();
+        });
+
+        row.querySelector('[data-role="delete"]').addEventListener('click', () => {
+          categoryOptions[rowData.category] = (categoryOptions[rowData.category] || []).filter(p => p !== rowData.product);
+          delete priceTable[rowData.product];
+          if (categoryOptions[rowData.category].length === 0) delete categoryOptions[rowData.category];
+          saveLocal();
+          renderAll();
+        });
+
+        wrap.appendChild(row);
+      });
+    }
+
     function renderMode() {
       const sales = document.getElementById('salesMode');
       const boss = document.getElementById('bossMode');
@@ -433,6 +498,7 @@
       renderItems();
       renderPreview();
       renderBoss();
+      renderProductManager();
     }
 
     document.getElementById('salesModeBtn').addEventListener('click', () => {
@@ -466,6 +532,37 @@
     document.getElementById('downloadBtn').addEventListener('click', async () => {
       const el = document.getElementById('quotePreview');
       const canvas = await html2canvas(el, { backgroundColor: '#ffffff', scale: 2 });
+      const link = document.createElement('a');
+      link.download = `報價單_${document.getElementById('customer').value || '未命名客戶'}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    document.getElementById('addProductBtn').addEventListener('click', () => {
+      const category = document.getElementById('newCategory').value.trim();
+      const product = document.getElementById('newProduct').value.trim();
+      const price = Number(document.getElementById('newPrice').value) || 0;
+      if (!category || !product) {
+        alert('請先填大分類與細項');
+        return;
+      }
+      if (!categoryOptions[category]) categoryOptions[category] = [];
+      if (!categoryOptions[category].includes(product)) categoryOptions[category].push(product);
+      priceTable[product] = price;
+      document.getElementById('newCategory').value = '';
+      document.getElementById('newProduct').value = '';
+      document.getElementById('newPrice').value = '';
+      saveLocal();
+      renderAll();
+    });
+
+    document.getElementById('resetProductsBtn').addEventListener('click', () => {
+      if (!confirm('確定要恢復預設品項嗎？目前自訂內容會被覆蓋。')) return;
+      priceTable = { ...defaultPriceTable };
+      categoryOptions = { ...defaultCategoryOptions };
+      saveLocal();
+      renderAll();
+    });
       const link = document.createElement('a');
       link.download = `報價單_${document.getElementById('customer').value || '未命名客戶'}.png`;
       link.href = canvas.toDataURL('image/png');
