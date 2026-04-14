@@ -144,6 +144,7 @@
       gap: 12px;
       border-bottom: 1px solid var(--soft);
       padding: 10px 0;
+      flex-wrap: wrap;
     }
     .status {
       display: inline-block;
@@ -162,6 +163,8 @@
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
       .topbar { flex-direction: column; align-items: stretch; }
       h1 { font-size: 22px; }
+      .history-row { flex-direction: column; align-items: stretch; }
+      .history-row .row { justify-content: flex-start; }
     }
   </style>
 </head>
@@ -532,11 +535,6 @@
     document.getElementById('downloadBtn').addEventListener('click', async () => {
       const el = document.getElementById('quotePreview');
       const canvas = await html2canvas(el, { backgroundColor: '#ffffff', scale: 2 });
-      const link = document.createElement('a');
-      link.download = `報價單_${document.getElementById('customer').value || '未命名客戶'}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    });
 
     document.getElementById('addProductBtn').addEventListener('click', () => {
       const category = document.getElementById('newCategory').value.trim();
