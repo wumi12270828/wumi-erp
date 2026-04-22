@@ -500,6 +500,40 @@
       renderAll();
     });
 
+    document.getElementById('updateCustomerBtn').addEventListener('click', () => {
+      const name = document.getElementById('customer').value.trim();
+      if (!name) {
+        alert('請先輸入客戶名稱');
+        return;
+      }
+
+      const existing = state.customers.find(c =>
+        normalizeCompareText(c.company) === normalizeCompareText(name)
+      );
+
+      const updatedData = {
+        company: name,
+        contact: document.getElementById('contact').value,
+        tel: document.getElementById('tel').value,
+        mobile: document.getElementById('mobile').value,
+        email: document.getElementById('email').value,
+        lineId: document.getElementById('lineId').value,
+        address: document.getElementById('address').value,
+        pricePlan: state.pricePlan
+      };
+
+      if (existing) {
+        Object.assign(existing, updatedData);
+        alert('已更新客戶資料');
+      } else {
+        state.customers.push(updatedData);
+        alert('已新增客戶');
+      }
+
+      saveLocal();
+      renderCustomerPicker();
+    });
+
     document.getElementById('downloadBtn').addEventListener('click', async () => {
       const el = document.getElementById('quotePreview');
       const canvas = await html2canvas(el, { backgroundColor: '#ffffff', scale: 2 });
@@ -596,38 +630,5 @@
     state.items = [newItem()];
     renderAll();
   </script>
-  document.getElementById('updateCustomerBtn').addEventListener('click', () => {
-  const name = document.getElementById('customer').value.trim();
-  if (!name) {
-    alert('請先輸入客戶名稱');
-    return;
-  }
-
-  const existing = state.customers.find(c => 
-    normalizeCompareText(c.company) === normalizeCompareText(name)
-  );
-
-  const updatedData = {
-    company: name,
-    contact: document.getElementById('contact').value,
-    tel: document.getElementById('tel').value,
-    mobile: document.getElementById('mobile').value,
-    email: document.getElementById('email').value,
-    lineId: document.getElementById('lineId').value,
-    address: document.getElementById('address').value,
-    pricePlan: state.pricePlan
-  };
-
-  if (existing) {
-    Object.assign(existing, updatedData);
-    alert('已更新客戶資料');
-  } else {
-    state.customers.push(updatedData);
-    alert('已新增客戶');
-  }
-
-  saveLocal();
-  renderCustomerPicker();
-});
 </body>
 </html>
