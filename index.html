@@ -181,6 +181,12 @@
     <div id="salesMode">
       <div class="card">
         <div class="card-title">快速報價</div>
+        <div class="row" style="margin-bottom:12px;">
+          <input id="customerSearch" placeholder="搜尋已匯入客戶 / 聯絡人 / 電話" style="flex:1;min-width:220px;" />
+          <label class="btn" for="customerFile">匯入客戶 Excel</label>
+          <input id="customerFile" type="file" accept=".xlsx,.xls,.csv" class="hidden" />
+        </div>
+        <div id="customerPickWrap" class="row" style="margin-bottom:12px;"></div>
         <div class="grid-2">
           <div><input id="customer" placeholder="客戶名稱" /></div>
           <div><input id="contact" placeholder="聯絡人" /></div>
@@ -251,6 +257,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script>
     const defaultPriceTable = {
       PVC: 500,
@@ -277,7 +284,8 @@
     const state = {
       mode: '業務',
       items: [],
-      quotes: JSON.parse(localStorage.getItem('wumi_quotes') || '[]')
+      quotes: JSON.parse(localStorage.getItem('wumi_quotes') || '[]'),
+      customers: JSON.parse(localStorage.getItem('wumi_customers') || '[]')
     };
 
     function newItem() {
@@ -314,6 +322,56 @@
       localStorage.setItem('wumi_quotes', JSON.stringify(state.quotes));
       localStorage.setItem('wumi_price_table', JSON.stringify(priceTable));
       localStorage.setItem('wumi_category_options', JSON.stringify(categoryOptions));
+      localStorage.setItem('wumi_customers', JSON.stringify(state.customers));
+    }
+
+    function normalizeCustomerRow(row) {
+      return {
+        company: row['客戶名稱'] || row['公司名稱'] || row['公司'] || row['客戶'] || '',
+        contact: row['聯絡人'] || row['窗口'] || '',
+        tel: row['市話'] || row['電話'] || '',
+        mobile: row['手機'] || row['行動電話'] || row['行動'] || '',
+        email: row['Email'] || row['EMAIL'] || row['email'] || '',
+        lineId: row['LINE'] || row['Line'] || row['line'] || ''
+      };
+    }
+
+    function pickCustomer(customer) {
+      document.getElementById('customer').value = customer.company || '';
+      document.getElementById('contact').value = customer.contact || '';
+      document.getElementById('tel').value = customer.tel || '';
+      document.getElementById('mobile').value = customer.mobile || '';
+      document.getElementById('email').value = customer.email || '';
+      document.getElementById('lineId').value = customer.lineId || '';
+      renderPreview();
+    }
+
+    function renderCustomerPicker() {
+      const keyword = (document.getElementById('customerSearch')?.value || '').trim().toLowerCase();
+      const wrap = document.getElementById('customerPickWrap');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+
+      const filtered = state.customers.filter(c => {
+        if (!keyword) return true;
+        return [c.company, c.contact, c.tel, c.mobile, c.email, c.lineId]
+          .filter(Boolean)
+          .some(v => String(v).toLowerCase().includes(keyword));
+      }).slice(0, 20);
+
+      if (!filtered.length) {
+        wrap.innerHTML = '<div class="muted">目前沒有可選客戶</div>';
+        return;
+      }
+
+      filtered.forEach(c => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn sm';
+        btn.textContent = c.company || '未命名客戶';
+        btn.addEventListener('click', () => pickCustomer(c));
+        wrap.appendChild(btn);
+      });
     }
 
     function renderItems() {
@@ -487,6 +545,7 @@
       renderPreview();
       renderBoss();
       renderProductManager();
+      renderCustomerPicker();
     }
 
     document.getElementById('salesModeBtn').addEventListener('click', () => {
@@ -554,6 +613,32 @@
 
     ['customer', 'contact', 'tel', 'mobile', 'email', 'lineId'].forEach(id => {
       document.getElementById(id).addEventListener('input', renderPreview);
+    });
+
+    document.getElementById('customerSearch').addEventListener('input', renderCustomerPicker);
+
+    document.getElementById('customerFile').addEventListener('change', async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+      const imported = rows.map(normalizeCustomerRow).filter(r => r.company);
+      if (!imported.length) {
+        alert('沒有讀到有效客戶資料，請確認欄位名稱。');
+        return;
+      }
+
+      const map = new Map();
+      [...state.customers, ...imported].forEach(c => {
+        map.set(c.company + '|' + (c.contact || ''), c);
+      });
+      state.customers = Array.from(map.values());
+      saveLocal();
+      renderCustomerPicker();
+      alert(`已匯入 ${imported.length} 筆客戶資料`);
+      event.target.value = '';
     });
 
     state.items = [newItem()];
