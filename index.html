@@ -15,149 +15,33 @@
       --soft: #f1ece4;
     }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: "Noto Sans TC", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-    .wrap {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    h1 {
-      margin: 0;
-      font-size: 26px;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 14px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.03);
-    }
-    .card-title {
-      font-weight: 700;
-      font-size: 18px;
-      margin-bottom: 12px;
-    }
-    .grid-2, .grid-3 {
-      display: grid;
-      gap: 10px;
-    }
+    body { margin: 0; font-family: "Noto Sans TC", Arial, sans-serif; background: var(--bg); color: var(--text); }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 16px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+    h1 { margin: 0; font-size: 26px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.03); }
+    .card-title { font-weight: 700; font-size: 18px; margin-bottom: 12px; }
+    .grid-2, .grid-3 { display: grid; gap: 10px; }
     .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    input, select, button, textarea {
-      font: inherit;
-    }
-    input, select {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 12px 14px;
-      background: #fff;
-      color: var(--text);
-    }
-    .btn {
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--text);
-      border-radius: 12px;
-      padding: 11px 14px;
-      cursor: pointer;
-    }
-    .btn.primary {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-    .btn.ghost {
-      background: transparent;
-    }
-    .btn.sm {
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 14px;
-    }
-    .row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .mode-btn.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-    .muted {
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .strong {
-      font-weight: 700;
-    }
-    .item-card {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-    .item-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      gap: 8px;
-    }
-    .quote-preview {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 18px;
-      margin-top: 10px;
-    }
-    .company {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .grand-total {
-      text-align: right;
-      font-size: 22px;
-      font-weight: 700;
-      margin: 8px 0 14px;
-    }
-    .history-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid var(--soft);
-      padding: 10px 0;
-      flex-wrap: wrap;
-    }
-    .status {
-      display: inline-block;
-      border-radius: 999px;
-      background: var(--soft);
-      padding: 5px 10px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .status.done {
-      background: #dff3e3;
-      color: #22743c;
-    }
+    input, select, button { font: inherit; }
+    input, select { width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: #fff; color: var(--text); }
+    .btn { border: 1px solid var(--line); background: #fff; color: var(--text); border-radius: 12px; padding: 11px 14px; cursor: pointer; }
+    .btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn.ghost { background: transparent; }
+    .btn.sm { border-radius: 999px; padding: 8px 12px; font-size: 14px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .mode-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .muted { color: var(--muted); font-size: 14px; }
+    .strong { font-weight: 700; }
+    .item-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+    .item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
+    .quote-preview { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px; margin-top: 10px; }
+    .company { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .grand-total { text-align: right; font-size: 22px; font-weight: 700; margin: 8px 0 14px; }
+    .history-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1px solid var(--soft); padding: 10px 0; flex-wrap: wrap; }
+    .status { display: inline-block; border-radius: 999px; background: var(--soft); padding: 5px 10px; font-size: 13px; color: var(--muted); }
+    .status.done { background: #dff3e3; color: #22743c; }
     .hidden { display: none !important; }
     @media (max-width: 640px) {
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
@@ -189,6 +73,9 @@
         <div id="customerPickWrap" class="row" style="margin-bottom:12px;"></div>
         <div class="grid-2">
           <div><input id="customer" placeholder="客戶名稱" /></div>
+          <div>
+            <select id="pricePlan"></select>
+          </div>
           <div><input id="contact" placeholder="聯絡人" /></div>
           <div><input id="tel" placeholder="市話" /></div>
           <div><input id="mobile" placeholder="行動電話" /></div>
@@ -214,6 +101,7 @@
         <div class="company">無名美工創意有限公司</div>
         <div>客戶：<span id="previewCustomer">—</span></div>
         <div>聯絡人：<span id="previewContact">—</span></div>
+        <div>價格方案：<span id="previewPricePlan">一般</span></div>
         <div>市話：<span id="previewTel">—</span> ｜ 行動：<span id="previewMobile">—</span></div>
         <div>Email：<span id="previewEmail">—</span> ｜ LINE：<span id="previewLine">—</span></div>
         <div style="margin-top:12px;font-weight:700;font-size:20px;">總金額：<span id="previewTotal">NT$ 0</span></div>
@@ -241,7 +129,12 @@
       </div>
 
       <div class="card">
-        <div class="card-title">品項管理</div>
+        <div class="card-title">價格表管理</div>
+        <div class="row" style="margin-bottom:12px;">
+          <label class="btn" for="priceFile">匯入價格表 Excel</label>
+          <input id="priceFile" type="file" accept=".xlsx,.xls,.csv" class="hidden" />
+          <input id="newPricePlanName" placeholder="價格表名稱，例如：現金會員" style="max-width:220px;" />
+        </div>
         <div class="grid-3" style="margin-bottom:10px;">
           <input id="newCategory" placeholder="大分類，例如：校園佈置" />
           <input id="newProduct" placeholder="細項，例如：PVC" />
@@ -249,7 +142,7 @@
         </div>
         <div class="row" style="margin-bottom:12px;">
           <button class="btn primary" id="addProductBtn" type="button">新增品項</button>
-          <button class="btn ghost" id="resetProductsBtn" type="button">恢復預設品項</button>
+          <button class="btn ghost" id="resetProductsBtn" type="button">恢復預設價格表</button>
         </div>
         <div id="productManageWrap"></div>
       </div>
@@ -271,6 +164,10 @@
       '施工': 2000
     };
 
+    const defaultPriceTables = {
+      一般: { ...defaultPriceTable }
+    };
+
     const defaultCategoryOptions = {
       校園佈置: ['PVC', 'PP', '合成板'],
       商業廣告: ['店卡', 'DM'],
@@ -278,14 +175,15 @@
       婚禮佈置: ['設計', '施工']
     };
 
-    let priceTable = JSON.parse(localStorage.getItem('wumi_price_table') || 'null') || { ...defaultPriceTable };
-    let categoryOptions = JSON.parse(localStorage.getItem('wumi_category_options') || 'null') || { ...defaultCategoryOptions };
+    let priceTables = JSON.parse(localStorage.getItem('wumi_price_tables') || 'null') || structuredClone(defaultPriceTables);
+    let categoryOptions = JSON.parse(localStorage.getItem('wumi_category_options') || 'null') || structuredClone(defaultCategoryOptions);
 
     const state = {
       mode: '業務',
       items: [],
       quotes: JSON.parse(localStorage.getItem('wumi_quotes') || '[]'),
-      customers: JSON.parse(localStorage.getItem('wumi_customers') || '[]')
+      customers: JSON.parse(localStorage.getItem('wumi_customers') || '[]'),
+      pricePlan: Object.keys(priceTables)[0] || '一般'
     };
 
     function newItem() {
@@ -300,11 +198,15 @@
       };
     }
 
+    function activePriceTable() {
+      return priceTables[state.pricePlan] || {};
+    }
+
     function getBase(item) {
       const w = Number(item.width) || 0;
       const h = Number(item.height) || 0;
       const q = Number(item.qty) || 0;
-      const unit = priceTable[item.product] || 0;
+      const unit = activePriceTable()[item.product] || 0;
       return w && h ? w * h * unit * q : unit * q;
     }
 
@@ -320,7 +222,7 @@
 
     function saveLocal() {
       localStorage.setItem('wumi_quotes', JSON.stringify(state.quotes));
-      localStorage.setItem('wumi_price_table', JSON.stringify(priceTable));
+      localStorage.setItem('wumi_price_tables', JSON.stringify(priceTables));
       localStorage.setItem('wumi_category_options', JSON.stringify(categoryOptions));
       localStorage.setItem('wumi_customers', JSON.stringify(state.customers));
     }
@@ -351,19 +253,16 @@
       const wrap = document.getElementById('customerPickWrap');
       if (!wrap) return;
       wrap.innerHTML = '';
-
       const filtered = state.customers.filter(c => {
         if (!keyword) return true;
         return [c.company, c.contact, c.tel, c.mobile, c.email, c.lineId]
           .filter(Boolean)
           .some(v => String(v).toLowerCase().includes(keyword));
       }).slice(0, 20);
-
       if (!filtered.length) {
         wrap.innerHTML = '<div class="muted">目前沒有可選客戶</div>';
         return;
       }
-
       filtered.forEach(c => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -372,6 +271,18 @@
         btn.addEventListener('click', () => pickCustomer(c));
         wrap.appendChild(btn);
       });
+    }
+
+    function renderPricePlanOptions() {
+      const select = document.getElementById('pricePlan');
+      if (!select) return;
+      const names = Object.keys(priceTables);
+      if (!names.length) {
+        priceTables = structuredClone(defaultPriceTables);
+      }
+      select.innerHTML = Object.keys(priceTables).map(name => `<option value="${name}">${name}價格</option>`).join('');
+      if (!priceTables[state.pricePlan]) state.pricePlan = Object.keys(priceTables)[0];
+      select.value = state.pricePlan;
     }
 
     function renderItems() {
@@ -401,7 +312,7 @@
             <input data-field="height" placeholder="高" value="${item.height}">
             <input data-field="qty" placeholder="數量" value="${item.qty}">
           </div>
-          <div class="muted" style="margin-top:10px;">單價：${priceTable[item.product] || 0}</div>
+          <div class="muted" style="margin-top:10px;">單價：${activePriceTable()[item.product] || 0}</div>
           <div class="muted">小計：NT$ ${Math.round(getBase(item)).toLocaleString()}</div>
           <input data-field="adjust" placeholder="加成 / 折扣 %（例如 10 或 -10）" value="${item.adjust}" style="margin-top:10px;">
           <div class="row" style="margin-top:10px;">
@@ -442,6 +353,7 @@
     function renderPreview() {
       document.getElementById('previewCustomer').textContent = document.getElementById('customer').value || '—';
       document.getElementById('previewContact').textContent = document.getElementById('contact').value || '—';
+      document.getElementById('previewPricePlan').textContent = state.pricePlan || '一般';
       document.getElementById('previewTel').textContent = document.getElementById('tel').value || '—';
       document.getElementById('previewMobile').textContent = document.getElementById('mobile').value || '—';
       document.getElementById('previewEmail').textContent = document.getElementById('email').value || '—';
@@ -455,17 +367,15 @@
       const revenue = done.reduce((sum, q) => sum + q.total, 0);
       document.getElementById('bossRevenue').textContent = 'NT$ ' + revenue.toLocaleString();
       document.getElementById('bossDoneCount').textContent = done.length;
-
       const wrap = document.getElementById('historyWrap');
       wrap.innerHTML = state.quotes.length ? '' : '<div class="muted">目前沒有資料</div>';
-
       state.quotes.forEach(q => {
         const row = document.createElement('div');
         row.className = 'history-row';
         row.innerHTML = `
           <div>
             <div class="strong">${q.customer || '未命名客戶'}</div>
-            <div class="muted">NT$ ${q.total.toLocaleString()}</div>
+            <div class="muted">${q.pricePlan || '一般'} ｜ NT$ ${q.total.toLocaleString()}</div>
           </div>
           <div class="row">
             <span class="status ${q.status === '已成交' ? 'done' : ''}">${q.status}</span>
@@ -490,12 +400,10 @@
       const rows = [];
       Object.keys(categoryOptions).forEach(category => {
         (categoryOptions[category] || []).forEach(product => {
-          rows.push({ category, product, price: priceTable[product] || 0 });
+          rows.push({ category, product, price: activePriceTable()[product] || 0 });
         });
       });
-
       wrap.innerHTML = rows.length ? '' : '<div class="muted">目前沒有品項</div>';
-
       rows.forEach(rowData => {
         const row = document.createElement('div');
         row.className = 'history-row';
@@ -510,22 +418,20 @@
             <button class="btn sm ghost" data-role="delete" type="button">刪除</button>
           </div>
         `;
-
         row.querySelector('[data-role="save"]').addEventListener('click', () => {
           const nextPrice = Number(row.querySelector('[data-role="price"]').value) || 0;
-          priceTable[rowData.product] = nextPrice;
+          if (!priceTables[state.pricePlan]) priceTables[state.pricePlan] = {};
+          priceTables[state.pricePlan][rowData.product] = nextPrice;
           saveLocal();
           renderAll();
         });
-
         row.querySelector('[data-role="delete"]').addEventListener('click', () => {
           categoryOptions[rowData.category] = (categoryOptions[rowData.category] || []).filter(p => p !== rowData.product);
-          delete priceTable[rowData.product];
-          if (categoryOptions[rowData.category].length === 0) delete categoryOptions[rowData.category];
+          if (priceTables[state.pricePlan]) delete priceTables[state.pricePlan][rowData.product];
+          if ((categoryOptions[rowData.category] || []).length === 0) delete categoryOptions[rowData.category];
           saveLocal();
           renderAll();
         });
-
         wrap.appendChild(row);
       });
     }
@@ -541,6 +447,7 @@
 
     function renderAll() {
       renderMode();
+      renderPricePlanOptions();
       renderItems();
       renderPreview();
       renderBoss();
@@ -558,6 +465,11 @@
       renderAll();
     });
 
+    document.getElementById('pricePlan').addEventListener('change', (e) => {
+      state.pricePlan = e.target.value;
+      renderAll();
+    });
+
     document.getElementById('addItemBtn').addEventListener('click', () => {
       state.items.push(newItem());
       renderAll();
@@ -567,6 +479,7 @@
       state.quotes.unshift({
         id: Date.now(),
         customer: document.getElementById('customer').value,
+        pricePlan: state.pricePlan,
         total: totalAmount(),
         status: '報價中',
         createdAt: new Date().toISOString()
@@ -595,7 +508,8 @@
       }
       if (!categoryOptions[category]) categoryOptions[category] = [];
       if (!categoryOptions[category].includes(product)) categoryOptions[category].push(product);
-      priceTable[product] = price;
+      if (!priceTables[state.pricePlan]) priceTables[state.pricePlan] = {};
+      priceTables[state.pricePlan][product] = price;
       document.getElementById('newCategory').value = '';
       document.getElementById('newProduct').value = '';
       document.getElementById('newPrice').value = '';
@@ -604,18 +518,39 @@
     });
 
     document.getElementById('resetProductsBtn').addEventListener('click', () => {
-      if (!confirm('確定要恢復預設品項嗎？目前自訂內容會被覆蓋。')) return;
-      priceTable = { ...defaultPriceTable };
-      categoryOptions = { ...defaultCategoryOptions };
+      if (!confirm('確定要恢復預設價格表嗎？目前自訂內容會被覆蓋。')) return;
+      priceTables = structuredClone(defaultPriceTables);
+      categoryOptions = structuredClone(defaultCategoryOptions);
+      state.pricePlan = '一般';
       saveLocal();
       renderAll();
     });
 
-    ['customer', 'contact', 'tel', 'mobile', 'email', 'lineId'].forEach(id => {
-      document.getElementById(id).addEventListener('input', renderPreview);
+    document.getElementById('priceFile').addEventListener('change', async (event) => {
+      const file = event.target.files?.[0];
+      const planName = document.getElementById('newPricePlanName').value.trim() || '現金會員';
+      if (!file) return;
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+      const nextTable = {};
+      rows.forEach(row => {
+        const product = row['品項'] || row['商品'] || row['名稱'] || row['細項'] || '';
+        const price = Number(row['價格'] || row['售價'] || row['單價'] || 0);
+        if (product) nextTable[product] = price;
+      });
+      if (!Object.keys(nextTable).length) {
+        alert('沒有讀到有效價格資料，請確認欄位是「品項 / 價格」。');
+        return;
+      }
+      priceTables[planName] = { ...defaultPriceTable, ...nextTable };
+      state.pricePlan = planName;
+      saveLocal();
+      renderAll();
+      alert(`已匯入價格表：${planName}`);
+      event.target.value = '';
     });
-
-    document.getElementById('customerSearch').addEventListener('input', renderCustomerPicker);
 
     document.getElementById('customerFile').addEventListener('change', async (event) => {
       const file = event.target.files?.[0];
@@ -629,7 +564,6 @@
         alert('沒有讀到有效客戶資料，請確認欄位名稱。');
         return;
       }
-
       const map = new Map();
       [...state.customers, ...imported].forEach(c => {
         map.set(c.company + '|' + (c.contact || ''), c);
@@ -640,6 +574,12 @@
       alert(`已匯入 ${imported.length} 筆客戶資料`);
       event.target.value = '';
     });
+
+    ['customer', 'contact', 'tel', 'mobile', 'email', 'lineId'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderPreview);
+    });
+
+    document.getElementById('customerSearch').addEventListener('input', renderCustomerPicker);
 
     state.items = [newItem()];
     renderAll();
