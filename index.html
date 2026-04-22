@@ -227,14 +227,23 @@
       localStorage.setItem('wumi_customers', JSON.stringify(state.customers));
     }
 
+    function normalizeHeaderKey(key) {
+      return String(key || '').replace(/\\s+/g, '').trim().toLowerCase();
+    }
+
     function normalizeCustomerRow(row) {
+      const normalized = {};
+      Object.keys(row || {}).forEach(key => {
+        normalized[normalizeHeaderKey(key)] = row[key];
+      });
+
       return {
-        company: row['客戶名稱'] || row['公司名稱'] || row['公司'] || row['客戶'] || '',
-        contact: row['聯絡人'] || row['窗口'] || '',
-        tel: row['市話'] || row['電話'] || '',
-        mobile: row['手機'] || row['行動電話'] || row['行動'] || '',
-        email: row['Email'] || row['EMAIL'] || row['email'] || '',
-        lineId: row['LINE'] || row['Line'] || row['line'] || ''
+        company: normalized['客戶名稱'] || normalized['公司名稱'] || normalized['公司'] || normalized['客戶'] || '',
+        contact: normalized['聯絡人'] || normalized['窗口'] || normalized['聯絡窗口'] || '',
+        tel: normalized['市話'] || normalized['電話'] || normalized['公司電話'] || '',
+        mobile: normalized['手機'] || normalized['行動電話'] || normalized['行動'] || normalized['手機號碼'] || '',
+        email: normalized['email'] || normalized['電子郵件'] || normalized['信箱'] || '',
+        lineId: normalized['line'] || normalized['lineid'] || normalized['line帳號'] || normalized['line帳號id'] || ''
       };
     }
 
@@ -251,20 +260,27 @@
       renderAll();
     }
 
+    function normalizeCompareText(value) {
+      return String(value || '').replace(/\\s+/g, '').trim().toLowerCase();
+    }
+
     function tryAutofillCustomer() {
-      const keyword = (document.getElementById('customer').value || '').trim().toLowerCase();
+      const keyword = normalizeCompareText(document.getElementById('customer').value || '');
       if (!keyword) return;
-      const matched = state.customers.find(c => String(c.company || '').trim().toLowerCase() === keyword)
-        || state.customers.find(c => String(c.company || '').trim().toLowerCase().includes(keyword));
-      if (matched) {
-        document.getElementById('contact').value = matched.contact || '';
-        document.getElementById('tel').value = matched.tel || '';
-        document.getElementById('mobile').value = matched.mobile || '';
-        document.getElementById('email').value = matched.email || '';
-        document.getElementById('lineId').value = matched.lineId || '';
-        if (matched.pricePlan && priceTables[matched.pricePlan]) {
-          state.pricePlan = matched.pricePlan;
-        }
+
+      let matched = state.customers.find(c => normalizeCompareText(c.company) === keyword);
+      if (!matched) {
+        matched = state.customers.find(c => normalizeCompareText(c.company).includes(keyword));
+      }
+      if (!matched) return;
+
+      document.getElementById('contact').value = matched.contact || '';
+      document.getElementById('tel').value = matched.tel || '';
+      document.getElementById('mobile').value = matched.mobile || '';
+      document.getElementById('email').value = matched.email || '';
+      document.getElementById('lineId').value = matched.lineId || '';
+      if (matched.pricePlan && priceTables[matched.pricePlan]) {
+        state.pricePlan = matched.pricePlan;
       }
     }
 
@@ -579,7 +595,7 @@
       const workbook = XLSX.read(data);
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-      const imported = rows.map(normalizeCustomerRow).filter(r => r.company);
+      const imported = rows.map(normalizeCustomerRow).filter(r => r.company && normalizeCompareText(r.company));
       if (!imported.length) {
         alert('沒有讀到有效客戶資料，請確認欄位名稱。');
         return;
