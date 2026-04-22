@@ -173,8 +173,8 @@
     <div class="topbar">
       <h1>無名美工報價系統</h1>
       <div class="row">
-        <button class="btn mode-btn active" id="salesModeBtn">業務模式</button>
-        <button class="btn mode-btn" id="bossModeBtn">老闆模式</button>
+        <button class="btn mode-btn active" id="salesModeBtn" type="button">業務模式</button>
+        <button class="btn mode-btn" id="bossModeBtn" type="button">老闆模式</button>
       </div>
     </div>
 
@@ -182,38 +182,26 @@
       <div class="card">
         <div class="card-title">快速報價</div>
         <div class="grid-2">
-          <div>
-            <input id="customer" placeholder="客戶名稱" />
-          </div>
-          <div>
-            <input id="contact" placeholder="聯絡人" />
-          </div>
-          <div>
-            <input id="tel" placeholder="市話" />
-          </div>
-          <div>
-            <input id="mobile" placeholder="行動電話" />
-          </div>
-          <div>
-            <input id="email" placeholder="Email" />
-          </div>
-          <div>
-            <input id="lineId" placeholder="LINE" />
-          </div>
+          <div><input id="customer" placeholder="客戶名稱" /></div>
+          <div><input id="contact" placeholder="聯絡人" /></div>
+          <div><input id="tel" placeholder="市話" /></div>
+          <div><input id="mobile" placeholder="行動電話" /></div>
+          <div><input id="email" placeholder="Email" /></div>
+          <div><input id="lineId" placeholder="LINE" /></div>
         </div>
       </div>
 
       <div id="itemsWrap"></div>
 
       <div class="row" style="margin-bottom:12px;">
-        <button class="btn" id="addItemBtn">＋ 新增明細</button>
+        <button class="btn" id="addItemBtn" type="button">＋ 新增明細</button>
       </div>
 
       <div class="grand-total" id="grandTotal">總計 NT$ 0</div>
 
       <div class="row">
-        <button class="btn primary" id="saveQuoteBtn">儲存報價</button>
-        <button class="btn" id="downloadBtn">下載報價單圖片</button>
+        <button class="btn primary" id="saveQuoteBtn" type="button">儲存報價</button>
+        <button class="btn" id="downloadBtn" type="button">下載報價單圖片</button>
       </div>
 
       <div class="quote-preview" id="quotePreview">
@@ -254,8 +242,8 @@
           <input id="newPrice" placeholder="價格，例如：500" />
         </div>
         <div class="row" style="margin-bottom:12px;">
-          <button class="btn primary" id="addProductBtn">新增品項</button>
-          <button class="btn ghost" id="resetProductsBtn">恢復預設品項</button>
+          <button class="btn primary" id="addProductBtn" type="button">新增品項</button>
+          <button class="btn ghost" id="resetProductsBtn" type="button">恢復預設品項</button>
         </div>
         <div id="productManageWrap"></div>
       </div>
@@ -338,7 +326,7 @@
         card.innerHTML = `
           <div class="item-head">
             <div class="strong">明細 ${idx + 1}</div>
-            <button class="btn sm ghost" data-action="remove">刪除</button>
+            <button class="btn sm ghost" data-action="remove" type="button">刪除</button>
           </div>
           <div class="grid-2">
             <select data-field="category">
@@ -359,25 +347,22 @@
           <div class="muted">小計：NT$ ${Math.round(getBase(item)).toLocaleString()}</div>
           <input data-field="adjust" placeholder="加成 / 折扣 %（例如 10 或 -10）" value="${item.adjust}" style="margin-top:10px;">
           <div class="row" style="margin-top:10px;">
-            <button class="btn sm" data-adjust="10">+10%</button>
-            <button class="btn sm" data-adjust="20">+20%</button>
-            <button class="btn sm" data-adjust="-10">-10%</button>
-            <button class="btn sm ghost" data-adjust="0">清除</button>
+            <button class="btn sm" data-adjust="10" type="button">+10%</button>
+            <button class="btn sm" data-adjust="20" type="button">+20%</button>
+            <button class="btn sm" data-adjust="-10" type="button">-10%</button>
+            <button class="btn sm ghost" data-adjust="0" type="button">清除</button>
           </div>
           <div class="strong" style="margin-top:10px;">調整後：NT$ ${getAdjusted(item).toLocaleString()}</div>
         `;
 
         card.querySelectorAll('[data-field]').forEach(el => {
-          el.addEventListener('input', (e) => {
+          const handler = (e) => {
             item[e.target.dataset.field] = e.target.value;
             if (e.target.dataset.field === 'category') item.product = '';
             renderAll();
-          });
-          el.addEventListener('change', (e) => {
-            item[e.target.dataset.field] = e.target.value;
-            if (e.target.dataset.field === 'category') item.product = '';
-            renderAll();
-          });
+          };
+          el.addEventListener('input', handler);
+          el.addEventListener('change', handler);
         });
 
         card.querySelector('[data-action="remove"]').addEventListener('click', () => {
@@ -426,7 +411,7 @@
           </div>
           <div class="row">
             <span class="status ${q.status === '已成交' ? 'done' : ''}">${q.status}</span>
-            ${q.status !== '已成交' ? '<button class="btn sm">成交</button>' : ''}
+            ${q.status !== '已成交' ? '<button class="btn sm" type="button">成交</button>' : ''}
           </div>
         `;
         const btn = row.querySelector('button');
@@ -463,8 +448,8 @@
           </div>
           <div class="row" style="align-items:center;">
             <input value="${rowData.price}" data-role="price" style="width:100px;" />
-            <button class="btn sm" data-role="save">儲存</button>
-            <button class="btn sm ghost" data-role="delete">刪除</button>
+            <button class="btn sm" data-role="save" type="button">儲存</button>
+            <button class="btn sm ghost" data-role="delete" type="button">刪除</button>
           </div>
         `;
 
@@ -535,6 +520,11 @@
     document.getElementById('downloadBtn').addEventListener('click', async () => {
       const el = document.getElementById('quotePreview');
       const canvas = await html2canvas(el, { backgroundColor: '#ffffff', scale: 2 });
+      const link = document.createElement('a');
+      link.download = `報價單_${document.getElementById('customer').value || '未命名客戶'}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
 
     document.getElementById('addProductBtn').addEventListener('click', () => {
       const category = document.getElementById('newCategory').value.trim();
@@ -560,11 +550,6 @@
       categoryOptions = { ...defaultCategoryOptions };
       saveLocal();
       renderAll();
-    });
-      const link = document.createElement('a');
-      link.download = `報價單_${document.getElementById('customer').value || '未命名客戶'}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
     });
 
     ['customer', 'contact', 'tel', 'mobile', 'email', 'lineId'].forEach(id => {
