@@ -245,7 +245,27 @@
       document.getElementById('mobile').value = customer.mobile || '';
       document.getElementById('email').value = customer.email || '';
       document.getElementById('lineId').value = customer.lineId || '';
-      renderPreview();
+      if (customer.pricePlan && priceTables[customer.pricePlan]) {
+        state.pricePlan = customer.pricePlan;
+      }
+      renderAll();
+    }
+
+    function tryAutofillCustomer() {
+      const keyword = (document.getElementById('customer').value || '').trim().toLowerCase();
+      if (!keyword) return;
+      const matched = state.customers.find(c => String(c.company || '').trim().toLowerCase() === keyword)
+        || state.customers.find(c => String(c.company || '').trim().toLowerCase().includes(keyword));
+      if (matched) {
+        document.getElementById('contact').value = matched.contact || '';
+        document.getElementById('tel').value = matched.tel || '';
+        document.getElementById('mobile').value = matched.mobile || '';
+        document.getElementById('email').value = matched.email || '';
+        document.getElementById('lineId').value = matched.lineId || '';
+        if (matched.pricePlan && priceTables[matched.pricePlan]) {
+          state.pricePlan = matched.pricePlan;
+        }
+      }
     }
 
     function renderCustomerPicker() {
@@ -575,8 +595,18 @@
       event.target.value = '';
     });
 
-    ['customer', 'contact', 'tel', 'mobile', 'email', 'lineId'].forEach(id => {
+    ['contact', 'tel', 'mobile', 'email', 'lineId'].forEach(id => {
       document.getElementById(id).addEventListener('input', renderPreview);
+    });
+
+    document.getElementById('customer').addEventListener('input', () => {
+      tryAutofillCustomer();
+      renderPreview();
+    });
+
+    document.getElementById('customer').addEventListener('change', () => {
+      tryAutofillCustomer();
+      renderAll();
     });
 
     document.getElementById('customerSearch').addEventListener('input', renderCustomerPicker);
