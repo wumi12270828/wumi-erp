@@ -79,6 +79,7 @@
           <div><input id="mobile" placeholder="行動電話" /></div>
           <div><input id="email" placeholder="Email" /></div>
           <div><input id="lineId" placeholder="LINE" /></div>
+          <div><input id="address" placeholder="地址" /></div>
         </div>
       </div>
 
@@ -102,6 +103,7 @@
         <div>價格方案：<span id="previewPricePlan">一般</span></div>
         <div>市話：<span id="previewTel">—</span> ｜ 行動：<span id="previewMobile">—</span></div>
         <div>Email：<span id="previewEmail">—</span> ｜ LINE：<span id="previewLine">—</span></div>
+        <div>地址：<span id="previewAddress">—</span></div>
         <div style="margin-top:12px;font-weight:700;font-size:20px;">總金額：<span id="previewTotal">NT$ 0</span></div>
       </div>
     </div>
@@ -233,7 +235,8 @@
         tel: getFirstValue(normalized, ['聯絡電話','電話','市話','公司電話','電話號碼','tel','電話1','聯絡電話1','officephone']),
         mobile: getFirstValue(normalized, ['手機','行動電話','行動','手機號碼','手機電話','mobile','cellphone','phone','行動號碼']),
         email: getFirstValue(normalized, ['email','電子郵件','信箱','mail','e-mail','電子信箱']),
-        lineId: getFirstValue(normalized, ['line','lineid','line帳號','line帳號id','line官方帳號','line官方','line好友'])
+        lineId: getFirstValue(normalized, ['line','lineid','line帳號','line帳號id','line官方帳號','line官方','line好友']),
+        address: getFirstValue(normalized, ['公司地址','地址','通訊地址','聯絡地址','公司住址','住址'])
       };
     }
 
@@ -244,6 +247,7 @@
       document.getElementById('mobile').value = customer.mobile || '';
       document.getElementById('email').value = customer.email || '';
       document.getElementById('lineId').value = customer.lineId || '';
+      document.getElementById('address').value = customer.address || '';
       if (customer.pricePlan && priceTables[customer.pricePlan]) state.pricePlan = customer.pricePlan;
       renderAll();
     }
@@ -259,6 +263,7 @@
       document.getElementById('mobile').value = matched.mobile || '';
       document.getElementById('email').value = matched.email || '';
       document.getElementById('lineId').value = matched.lineId || '';
+      document.getElementById('address').value = matched.address || '';
       if (matched.pricePlan && priceTables[matched.pricePlan]) state.pricePlan = matched.pricePlan;
     }
 
@@ -269,7 +274,7 @@
       wrap.innerHTML = '';
       const filtered = state.customers.filter(c => {
         if (!keyword) return true;
-        return [c.company, c.contact, c.tel, c.mobile, c.email, c.lineId]
+        return [c.company, c.contact, c.tel, c.mobile, c.email, c.lineId, c.address]
           .filter(Boolean)
           .some(v => normalizeCompareText(v).includes(keyword));
       }).slice(0, 20);
@@ -368,6 +373,7 @@
       document.getElementById('previewMobile').textContent = document.getElementById('mobile').value || '—';
       document.getElementById('previewEmail').textContent = document.getElementById('email').value || '—';
       document.getElementById('previewLine').textContent = document.getElementById('lineId').value || '—';
+      document.getElementById('previewAddress').textContent = document.getElementById('address').value || '—';
       document.getElementById('previewTotal').textContent = 'NT$ ' + totalAmount().toLocaleString();
       document.getElementById('grandTotal').textContent = '總計 NT$ ' + totalAmount().toLocaleString();
     }
@@ -570,7 +576,7 @@
       event.target.value = '';
     });
 
-    ['contact', 'tel', 'mobile', 'email', 'lineId'].forEach(id => {
+    ['contact', 'tel', 'mobile', 'email', 'lineId', 'address'].forEach(id => {
       document.getElementById(id).addEventListener('input', renderPreview);
     });
 
