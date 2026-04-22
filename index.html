@@ -228,11 +228,30 @@
     }
 
     function normalizeHeaderKey(key) {
+      return String(key || '').replace(/\s+/g, '').trim().toLowerCase();
+    }
+
+    function normalizeHeaderKey(key) {
       return String(key || '').replace(/\\s+/g, '').trim().toLowerCase();
     }
 
     function normalizeCustomerRow(row) {
       const normalized = {};
+      Object.keys(row || {}).forEach(key => {
+        normalized[normalizeHeaderKey(key)] = row[key];
+      });
+
+      return {
+        // 對應你實際Excel欄位
+        company: normalized['客戶名稱'] || normalized['公司名稱'] || '',
+        contact: normalized['聯絡人'] || '',
+        tel: normalized['聯絡電話'] || normalized['電話'] || '',
+        mobile: '',
+        email: '',
+        lineId: ''
+        // 傳真欄已完全忽略
+      };
+    };
       Object.keys(row || {}).forEach(key => {
         normalized[normalizeHeaderKey(key)] = row[key];
       });
@@ -261,7 +280,7 @@
     }
 
     function normalizeCompareText(value) {
-      return String(value || '').replace(/\\s+/g, '').trim().toLowerCase();
+      return String(value || '').replace(/\s+/g, '').trim().toLowerCase();
     }
 
     function tryAutofillCustomer() {
