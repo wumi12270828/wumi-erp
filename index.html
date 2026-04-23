@@ -70,16 +70,17 @@
           <label class="btn" for="customerFile">匯入客戶 Excel</label>
           <input id="customerFile" type="file" accept=".xlsx,.xls,.csv" class="hidden" />
         </div>
-        <div id="customerPickWrap" class="row" style="margin-bottom:12px;"></div>
+        <div id="customerPickWrap" class="row" style="margin-bottom:12px; flex-wrap:nowrap; overflow-x:auto; white-space:nowrap;"></div>
         <div class="grid-2">
           <div><input id="customer" placeholder="客戶名稱" /></div>
-          <div><select id="pricePlan"></select></div>
+          <div>
+            <select id="pricePlan"></select>
+          </div>
           <div><input id="contact" placeholder="聯絡人" /></div>
           <div><input id="tel" placeholder="市話" /></div>
           <div><input id="mobile" placeholder="行動電話" /></div>
           <div><input id="email" placeholder="Email" /></div>
           <div><input id="lineId" placeholder="LINE" /></div>
-          <div><input id="address" placeholder="地址" /></div>
         </div>
       </div>
 
@@ -93,7 +94,6 @@
 
       <div class="row">
         <button class="btn primary" id="saveQuoteBtn" type="button">儲存報價</button>
-        <button class="btn" id="updateCustomerBtn" type="button">更新客戶資料</button>
         <button class="btn" id="downloadBtn" type="button">下載報價單圖片</button>
       </div>
 
@@ -104,7 +104,6 @@
         <div>價格方案：<span id="previewPricePlan">一般</span></div>
         <div>市話：<span id="previewTel">—</span> ｜ 行動：<span id="previewMobile">—</span></div>
         <div>Email：<span id="previewEmail">—</span> ｜ LINE：<span id="previewLine">—</span></div>
-        <div>地址：<span id="previewAddress">—</span></div>
         <div style="margin-top:12px;font-weight:700;font-size:20px;">總金額：<span id="previewTotal">NT$ 0</span></div>
       </div>
     </div>
@@ -113,8 +112,14 @@
       <div class="card">
         <div class="card-title">老闆控制台</div>
         <div class="grid-2">
-          <div><div class="muted">總營收</div><div class="strong" id="bossRevenue">NT$ 0</div></div>
-          <div><div class="muted">成交數</div><div class="strong" id="bossDoneCount">0</div></div>
+          <div>
+            <div class="muted">總營收</div>
+            <div class="strong" id="bossRevenue">NT$ 0</div>
+          </div>
+          <div>
+            <div class="muted">成交數</div>
+            <div class="strong" id="bossDoneCount">0</div>
+          </div>
         </div>
       </div>
 
@@ -159,7 +164,10 @@
       '施工': 2000
     };
 
-    const defaultPriceTables = { 一般: { ...defaultPriceTable } };
+    const defaultPriceTables = {
+      一般: { ...defaultPriceTable }
+    };
+
     const defaultCategoryOptions = {
       校園佈置: ['PVC', 'PP', '合成板'],
       商業廣告: ['店卡', 'DM'],
@@ -179,10 +187,20 @@
     };
 
     function newItem() {
-      return { id: Date.now() + Math.random(), category: '', product: '', width: '', height: '', qty: '1', adjust: '0' };
+      return {
+        id: Date.now() + Math.random(),
+        category: '',
+        product: '',
+        width: '',
+        height: '',
+        qty: '1',
+        adjust: '0'
+      };
     }
 
-    function activePriceTable() { return priceTables[state.pricePlan] || {}; }
+    function activePriceTable() {
+      return priceTables[state.pricePlan] || {};
+    }
 
     function getBase(item) {
       const w = Number(item.width) || 0;
@@ -198,7 +216,9 @@
       return Math.round(base * (1 + adjust / 100));
     }
 
-    function totalAmount() { return state.items.reduce((sum, item) => sum + getAdjusted(item), 0); }
+    function totalAmount() {
+      return state.items.reduce((sum, item) => sum + getAdjusted(item), 0);
+    }
 
     function saveLocal() {
       localStorage.setItem('wumi_quotes', JSON.stringify(state.quotes));
@@ -208,20 +228,11 @@
     }
 
     function normalizeHeaderKey(key) {
-      return String(key || '').replace(/[\s　]+/g, '').replace(/[：:]/g, '').trim().toLowerCase();
+      return String(key || '').replace(/\s+/g, '').trim().toLowerCase();
     }
 
-    function getFirstValue(obj, keys) {
-      for (const key of keys) {
-        if (obj[key] !== undefined && obj[key] !== null && String(obj[key]).trim() !== '') {
-          return String(obj[key]).trim();
-        }
-      }
-      return '';
-    }
-
-    function normalizeCompareText(value) {
-      return String(value || '').replace(/[\s　]+/g, '').trim().toLowerCase();
+    function normalizeHeaderKey(key) {
+      return String(key || '').replace(/\s+/g, '').trim().toLowerCase();
     }
 
     function normalizeCustomerRow(row) {
@@ -231,13 +242,27 @@
       });
 
       return {
-        company: getFirstValue(normalized, ['客戶名稱','公司名稱','公司','客戶','客戶名','名稱','店名','單位名稱','機構名稱']),
-        contact: getFirstValue(normalized, ['聯絡人','聯絡窗口','窗口','聯絡窗口姓名','承辦人','承辦','負責人','窗口姓名','聯絡姓名','姓名','contact','contactname']),
-        tel: getFirstValue(normalized, ['聯絡電話','電話','市話','公司電話','電話號碼','tel','電話1','聯絡電話1','officephone']),
-        mobile: getFirstValue(normalized, ['手機','行動電話','行動','手機號碼','手機電話','mobile','cellphone','phone','行動號碼']),
-        email: getFirstValue(normalized, ['email','電子郵件','信箱','mail','e-mail','電子信箱']),
-        lineId: getFirstValue(normalized, ['line','lineid','line帳號','line帳號id','line官方帳號','line官方','line好友']),
-        address: getFirstValue(normalized, ['公司地址','地址','通訊地址','聯絡地址','公司住址','住址'])
+        // 對應你實際Excel欄位
+        company: normalized['客戶名稱'] || normalized['公司名稱'] || '',
+        contact: normalized['聯絡人'] || '',
+        tel: normalized['聯絡電話'] || normalized['電話'] || '',
+        mobile: '',
+        email: '',
+        lineId: ''
+        // 傳真欄已完全忽略
+      };
+    };
+      Object.keys(row || {}).forEach(key => {
+        normalized[normalizeHeaderKey(key)] = row[key];
+      });
+
+      return {
+        company: normalized['客戶名稱'] || normalized['公司名稱'] || normalized['公司'] || normalized['客戶'] || '',
+        contact: normalized['聯絡人'] || normalized['窗口'] || normalized['聯絡窗口'] || '',
+        tel: normalized['市話'] || normalized['電話'] || normalized['公司電話'] || '',
+        mobile: normalized['手機'] || normalized['行動電話'] || normalized['行動'] || normalized['手機號碼'] || '',
+        email: normalized['email'] || normalized['電子郵件'] || normalized['信箱'] || '',
+        lineId: normalized['line'] || normalized['lineid'] || normalized['line帳號'] || normalized['line帳號id'] || ''
       };
     }
 
@@ -248,36 +273,46 @@
       document.getElementById('mobile').value = customer.mobile || '';
       document.getElementById('email').value = customer.email || '';
       document.getElementById('lineId').value = customer.lineId || '';
-      document.getElementById('address').value = customer.address || '';
-      if (customer.pricePlan && priceTables[customer.pricePlan]) state.pricePlan = customer.pricePlan;
+      if (customer.pricePlan && priceTables[customer.pricePlan]) {
+        state.pricePlan = customer.pricePlan;
+      }
       renderAll();
+    }
+
+    function normalizeCompareText(value) {
+      return String(value || '').replace(/\s+/g, '').trim().toLowerCase();
     }
 
     function tryAutofillCustomer() {
       const keyword = normalizeCompareText(document.getElementById('customer').value || '');
       if (!keyword) return;
+
       let matched = state.customers.find(c => normalizeCompareText(c.company) === keyword);
-      if (!matched) matched = state.customers.find(c => normalizeCompareText(c.company).includes(keyword));
+      if (!matched) {
+        matched = state.customers.find(c => normalizeCompareText(c.company).includes(keyword));
+      }
       if (!matched) return;
+
       document.getElementById('contact').value = matched.contact || '';
       document.getElementById('tel').value = matched.tel || '';
       document.getElementById('mobile').value = matched.mobile || '';
       document.getElementById('email').value = matched.email || '';
       document.getElementById('lineId').value = matched.lineId || '';
-      document.getElementById('address').value = matched.address || '';
-      if (matched.pricePlan && priceTables[matched.pricePlan]) state.pricePlan = matched.pricePlan;
+      if (matched.pricePlan && priceTables[matched.pricePlan]) {
+        state.pricePlan = matched.pricePlan;
+      }
     }
 
     function renderCustomerPicker() {
-      const keyword = normalizeCompareText(document.getElementById('customerSearch')?.value || '');
+      const keyword = (document.getElementById('customerSearch')?.value || '').trim().toLowerCase();
       const wrap = document.getElementById('customerPickWrap');
       if (!wrap) return;
       wrap.innerHTML = '';
       const filtered = state.customers.filter(c => {
         if (!keyword) return true;
-        return [c.company, c.contact, c.tel, c.mobile, c.email, c.lineId, c.address]
+        return [c.company, c.contact, c.tel, c.mobile, c.email, c.lineId]
           .filter(Boolean)
-          .some(v => normalizeCompareText(v).includes(keyword));
+          .some(v => String(v).toLowerCase().includes(keyword));
       }).slice(0, 20);
       if (!filtered.length) {
         wrap.innerHTML = '<div class="muted">目前沒有可選客戶</div>';
@@ -296,7 +331,10 @@
     function renderPricePlanOptions() {
       const select = document.getElementById('pricePlan');
       if (!select) return;
-      if (!Object.keys(priceTables).length) priceTables = structuredClone(defaultPriceTables);
+      const names = Object.keys(priceTables);
+      if (!names.length) {
+        priceTables = structuredClone(defaultPriceTables);
+      }
       select.innerHTML = Object.keys(priceTables).map(name => `<option value="${name}">${name}價格</option>`).join('');
       if (!priceTables[state.pricePlan]) state.pricePlan = Object.keys(priceTables)[0];
       select.value = state.pricePlan;
@@ -305,6 +343,7 @@
     function renderItems() {
       const wrap = document.getElementById('itemsWrap');
       wrap.innerHTML = '';
+
       state.items.forEach((item, idx) => {
         const card = document.createElement('div');
         card.className = 'item-card';
@@ -374,7 +413,6 @@
       document.getElementById('previewMobile').textContent = document.getElementById('mobile').value || '—';
       document.getElementById('previewEmail').textContent = document.getElementById('email').value || '—';
       document.getElementById('previewLine').textContent = document.getElementById('lineId').value || '—';
-      document.getElementById('previewAddress').textContent = document.getElementById('address').value || '—';
       document.getElementById('previewTotal').textContent = 'NT$ ' + totalAmount().toLocaleString();
       document.getElementById('grandTotal').textContent = '總計 NT$ ' + totalAmount().toLocaleString();
     }
@@ -462,15 +500,6 @@
       boss.classList.toggle('hidden', state.mode !== '老闆');
     }
 
-    function renderPricePlanOptions() {
-      const select = document.getElementById('pricePlan');
-      if (!select) return;
-      if (!Object.keys(priceTables).length) priceTables = structuredClone(defaultPriceTables);
-      select.innerHTML = Object.keys(priceTables).map(name => `<option value="${name}">${name}價格</option>`).join('');
-      if (!priceTables[state.pricePlan]) state.pricePlan = Object.keys(priceTables)[0];
-      select.value = state.pricePlan;
-    }
-
     function renderAll() {
       renderMode();
       renderPricePlanOptions();
@@ -481,10 +510,25 @@
       renderCustomerPicker();
     }
 
-    document.getElementById('salesModeBtn').addEventListener('click', () => { state.mode = '業務'; renderAll(); });
-    document.getElementById('bossModeBtn').addEventListener('click', () => { state.mode = '老闆'; renderAll(); });
-    document.getElementById('pricePlan').addEventListener('change', (e) => { state.pricePlan = e.target.value; renderAll(); });
-    document.getElementById('addItemBtn').addEventListener('click', () => { state.items.push(newItem()); renderAll(); });
+    document.getElementById('salesModeBtn').addEventListener('click', () => {
+      state.mode = '業務';
+      renderAll();
+    });
+
+    document.getElementById('bossModeBtn').addEventListener('click', () => {
+      state.mode = '老闆';
+      renderAll();
+    });
+
+    document.getElementById('pricePlan').addEventListener('change', (e) => {
+      state.pricePlan = e.target.value;
+      renderAll();
+    });
+
+    document.getElementById('addItemBtn').addEventListener('click', () => {
+      state.items.push(newItem());
+      renderAll();
+    });
 
     document.getElementById('saveQuoteBtn').addEventListener('click', () => {
       state.quotes.unshift({
@@ -500,40 +544,6 @@
       renderAll();
     });
 
-    document.getElementById('updateCustomerBtn').addEventListener('click', () => {
-      const name = document.getElementById('customer').value.trim();
-      if (!name) {
-        alert('請先輸入客戶名稱');
-        return;
-      }
-
-      const existing = state.customers.find(c =>
-        normalizeCompareText(c.company) === normalizeCompareText(name)
-      );
-
-      const updatedData = {
-        company: name,
-        contact: document.getElementById('contact').value,
-        tel: document.getElementById('tel').value,
-        mobile: document.getElementById('mobile').value,
-        email: document.getElementById('email').value,
-        lineId: document.getElementById('lineId').value,
-        address: document.getElementById('address').value,
-        pricePlan: state.pricePlan
-      };
-
-      if (existing) {
-        Object.assign(existing, updatedData);
-        alert('已更新客戶資料');
-      } else {
-        state.customers.push(updatedData);
-        alert('已新增客戶');
-      }
-
-      saveLocal();
-      renderCustomerPicker();
-    });
-
     document.getElementById('downloadBtn').addEventListener('click', async () => {
       const el = document.getElementById('quotePreview');
       const canvas = await html2canvas(el, { backgroundColor: '#ffffff', scale: 2 });
@@ -547,7 +557,10 @@
       const category = document.getElementById('newCategory').value.trim();
       const product = document.getElementById('newProduct').value.trim();
       const price = Number(document.getElementById('newPrice').value) || 0;
-      if (!category || !product) { alert('請先填大分類與細項'); return; }
+      if (!category || !product) {
+        alert('請先填大分類與細項');
+        return;
+      }
       if (!categoryOptions[category]) categoryOptions[category] = [];
       if (!categoryOptions[category].includes(product)) categoryOptions[category].push(product);
       if (!priceTables[state.pricePlan]) priceTables[state.pricePlan] = {};
@@ -578,13 +591,14 @@
       const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
       const nextTable = {};
       rows.forEach(row => {
-        const normalized = {};
-        Object.keys(row || {}).forEach(key => { normalized[normalizeHeaderKey(key)] = row[key]; });
-        const product = getFirstValue(normalized, ['品項','商品','名稱','細項']);
-        const price = Number(getFirstValue(normalized, ['價格','售價','單價']) || 0);
+        const product = row['品項'] || row['商品'] || row['名稱'] || row['細項'] || '';
+        const price = Number(row['價格'] || row['售價'] || row['單價'] || 0);
         if (product) nextTable[product] = price;
       });
-      if (!Object.keys(nextTable).length) { alert('沒有讀到有效價格資料，請確認欄位是「品項 / 價格」。'); return; }
+      if (!Object.keys(nextTable).length) {
+        alert('沒有讀到有效價格資料，請確認欄位是「品項 / 價格」。');
+        return;
+      }
       priceTables[planName] = { ...defaultPriceTable, ...nextTable };
       state.pricePlan = planName;
       saveLocal();
@@ -601,9 +615,14 @@
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
       const imported = rows.map(normalizeCustomerRow).filter(r => r.company && normalizeCompareText(r.company));
-      if (!imported.length) { alert('沒有讀到有效客戶資料，請確認欄位名稱。'); return; }
+      if (!imported.length) {
+        alert('沒有讀到有效客戶資料，請確認欄位名稱。');
+        return;
+      }
       const map = new Map();
-      [...state.customers, ...imported].forEach(c => { map.set(normalizeCompareText(c.company) + '|' + normalizeCompareText(c.contact), c); });
+      [...state.customers, ...imported].forEach(c => {
+        map.set(c.company + '|' + (c.contact || ''), c);
+      });
       state.customers = Array.from(map.values());
       saveLocal();
       renderCustomerPicker();
@@ -611,7 +630,7 @@
       event.target.value = '';
     });
 
-    ['contact', 'tel', 'mobile', 'email', 'lineId', 'address'].forEach(id => {
+    ['contact', 'tel', 'mobile', 'email', 'lineId'].forEach(id => {
       document.getElementById(id).addEventListener('input', renderPreview);
     });
 
