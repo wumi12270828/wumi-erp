@@ -231,6 +231,12 @@
 
     function pickCustomer(customer) {
       fillCustomerFields(customer);
+      const idx = state.customers.findIndex(c => normalizeCompareText(c.company) === normalizeCompareText(customer.company));
+      if (idx > 0) {
+        const picked = state.customers.splice(idx, 1)[0];
+        state.customers.unshift(picked);
+      }
+      saveLocal();
       renderAll();
     }
 
@@ -385,6 +391,23 @@
     document.getElementById('addItemBtn').addEventListener('click', () => { state.items.push(newItem()); renderAll(); });
 
     document.getElementById('saveQuoteBtn').addEventListener('click', () => {
+      const name = document.getElementById('customer').value.trim();
+      if (name) {
+        const existing = state.customers.find(c => normalizeCompareText(c.company) === normalizeCompareText(name));
+        const data = {
+          company: name,
+          contact: document.getElementById('contact').value,
+          tel: document.getElementById('tel').value,
+          mobile: document.getElementById('mobile').value,
+          email: document.getElementById('email').value,
+          lineId: document.getElementById('lineId').value,
+          address: document.getElementById('address').value,
+          pricePlan: state.pricePlan
+        };
+        if (existing) Object.assign(existing, data);
+        else state.customers.unshift(data);
+      }
+
       state.quotes.unshift({
         id: Date.now(),
         customer: document.getElementById('customer').value,
@@ -413,7 +436,7 @@
         pricePlan: state.pricePlan
       };
       if (existing) Object.assign(existing, updatedData);
-      else state.customers.push(updatedData);
+      else state.customers.unshift(updatedData);
       saveLocal();
       renderCustomerPicker();
       alert('已更新客戶資料');
