@@ -470,7 +470,629 @@
     });
 
     ['contact', 'tel', 'mobile', 'email', 'lineId', 'address'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderPreview);<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>無名美工報價系統</title>
+  <style>
+    :root {
+      --bg: #f7f4ef;
+      --card: #ffffff;
+      --line: #e5ded3;
+      --text: #2d2a26;
+      --muted: #7a6f63;
+      --primary: #2f2a24;
+      --soft: #f1ece4;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Noto Sans TC", Arial, sans-serif; background: var(--bg); color: var(--text); }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 16px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+    h1 { margin: 0; font-size: 26px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.03); }
+    .card-title { font-weight: 700; font-size: 18px; margin-bottom: 12px; }
+    .grid-2, .grid-3 { display: grid; gap: 10px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    input, select, button, textarea { font: inherit; }
+    input, select, textarea {
+      width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: #fff; color: var(--text);
+    }
+    .btn { border: 1px solid var(--line); background: #fff; color: var(--text); border-radius: 12px; padding: 11px 14px; cursor: pointer; }
+    .btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn.ghost { background: transparent; }
+    .btn.sm { border-radius: 999px; padding: 8px 12px; font-size: 14px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .mode-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .muted { color: var(--muted); font-size: 14px; }
+    .strong { font-weight: 700; }
+    .item-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+    .item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
+    .quote-preview { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px; margin-top: 10px; }
+    .company { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .grand-total { text-align: right; font-size: 22px; font-weight: 700; margin: 8px 0 14px; }
+    .history-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1px solid var(--soft); padding: 10px 0; flex-wrap: wrap; }
+    .status { display: inline-block; border-radius: 999px; background: var(--soft); padding: 5px 10px; font-size: 13px; color: var(--muted); }
+    .status.done { background: #dff3e3; color: #22743c; }
+    .hidden { display: none !important; }
+
+    #customerPickWrap {
+      display: flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+    #customerPickWrap .btn { flex: 0 0 auto; }
+
+    @media (max-width: 640px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: stretch; }
+      h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <h1>無名美工報價系統</h1>
+      <div class="row">
+        <button class="btn mode-btn active" id="salesModeBtn" type="button">業務模式</button>
+        <button class="btn mode-btn" id="bossModeBtn" type="button">老闆模式</button>
+      </div>
+    </div>
+
+    <div id="salesMode">
+      <div class="card">
+        <div class="card-title">快速報價</div>
+        <div class="row" style="margin-bottom:12px;">
+          <input id="customerSearch" placeholder="搜尋已匯入客戶 / 聯絡人 / 電話" style="flex:1;min-width:220px;" />
+          <label class="btn" for="customerFile">匯入客戶 Excel</label>
+          <input id="customerFile" type="file" accept=".xlsx,.xls,.csv" class="hidden" />
+        </div>
+
+        <div id="customerPickWrap" style="margin-bottom:12px;"></div>
+
+        <div class="row" style="margin-bottom:12px;">
+          <label class="btn" for="attachmentFile">上傳現場照片 / PDF 到 NAS</label>
+          <input id="attachmentFile" type="file" accept="image/*,.pdf" class="hidden" />
+          <span class="muted" id="attachmentStatus">尚未上傳附件</span>
+        </div>
+
+        <div class="grid-2">
+          <div><input id="customer" placeholder="客戶名稱" /></div>
+          <div><select id="pricePlan"></select></div>
+          <div><input id="contact" placeholder="聯絡人" /></div>
+          <div><input id="tel" placeholder="市話" /></div>
+          <div><input id="mobile" placeholder="行動電話" /></div>
+          <div><input id="email" placeholder="Email" /></div>
+          <div><input id="lineId" placeholder="LINE" /></div>
+          <div><input id="address" placeholder="地址" /></div>
+        </div>
+      </div>
+
+      <div id="itemsWrap"></div>
+
+      <div class="row" style="margin-bottom:12px;">
+        <button class="btn" id="addItemBtn" type="button">＋ 新增明細</button>
+      </div>
+
+      <div class="grand-total" id="grandTotal">總計 NT$ 0</div>
+
+      <div class="row">
+        <button class="btn primary" id="saveQuoteBtn" type="button">儲存報價</button>
+        <button class="btn" id="updateCustomerBtn" type="button">更新客戶資料</button>
+        <button class="btn" id="downloadBtn" type="button">下載報價單圖片</button>
+      </div>
+
+      <div class="quote-preview" id="quotePreview">
+        <div class="company">無名美工創意有限公司</div>
+        <div>客戶：<span id="previewCustomer">—</span></div>
+        <div>聯絡人：<span id="previewContact">—</span></div>
+        <div>價格方案：<span id="previewPricePlan">一般</span></div>
+        <div>市話：<span id="previewTel">—</span> ｜ 行動：<span id="previewMobile">—</span></div>
+        <div>Email：<span id="previewEmail">—</span> ｜ LINE：<span id="previewLine">—</span></div>
+        <div>地址：<span id="previewAddress">—</span></div>
+        <div style="margin-top:12px;font-weight:700;font-size:20px;">總金額：<span id="previewTotal">NT$ 0</span></div>
+      </div>
+    </div>
+
+    <div id="bossMode" class="hidden">
+      <div class="card">
+        <div class="card-title">老闆控制台</div>
+        <div class="grid-2">
+          <div><div class="muted">總營收</div><div class="strong" id="bossRevenue">NT$ 0</div></div>
+          <div><div class="muted">成交數</div><div class="strong" id="bossDoneCount">0</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">報價紀錄</div>
+        <div id="historyWrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+
+    const NAS_API = "http://192.168.1.2/wumi-api/api.php";
+
+    async function loadCustomersFromNAS() {
+      try {
+        const res = await fetch(`${NAS_API}?action=get_customers`);
+        const data = await res.json();
+        if (data.ok) {
+          state.customers = data.customers || [];
+          saveLocal();
+          renderCustomerPicker();
+        }
+      } catch (err) {
+        console.warn("NAS客戶讀取失敗，先使用本機資料", err);
+      }
+    }
+
+    async function loadQuotesFromNAS() {
+      try {
+        const res = await fetch(`${NAS_API}?action=get_quotes`);
+        const data = await res.json();
+        if (data.ok) {
+          state.quotes = data.quotes || state.quotes || [];
+          saveLocal();
+          renderBoss();
+        }
+      } catch (err) {
+        console.warn("NAS報價讀取失敗，先使用本機資料", err);
+      }
+    }
+
+    async function saveCustomerToNAS(customer) {
+      try {
+        await fetch(`${NAS_API}?action=save_customer`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(customer)
+        });
+      } catch (err) {
+        console.warn("NAS客戶儲存失敗", err);
+      }
+    }
+
+    async function saveQuoteToNAS(quote) {
+      try {
+        await fetch(`${NAS_API}?action=save_quote`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(quote)
+        });
+      } catch (err) {
+        console.warn("NAS報價儲存失敗", err);
+      }
+    }
+
+    async function uploadAttachmentToNAS(file) {
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch(`${NAS_API}?action=upload_file`, {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById("attachmentStatus").textContent = "已上傳：" + data.filename;
+          alert("附件已上傳到 NAS");
+        } else {
+          alert("附件上傳失敗：" + (data.error || "未知錯誤"));
+        }
+      } catch (err) {
+        alert("附件上傳失敗，請確認 NAS 連線");
+        console.warn(err);
+      }
+    }
+
+    async function saveQuoteImageToNAS() {
+      try {
+        const el = document.getElementById('quotePreview');
+        const canvas = await html2canvas(el, { backgroundColor: '#ffffff', scale: 2 });
+        const image = canvas.toDataURL("image/png");
+        const customerName = document.getElementById('customer').value || "未命名客戶";
+        await fetch(`${NAS_API}?action=save_quote_image`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: customerName,
+            image: image,
+            total: totalAmount(),
+            createdAt: new Date().toISOString()
+          })
+        });
+      } catch (err) {
+        console.warn("報價單圖片存NAS失敗", err);
+      }
+    }
+
+    async function loadDashboardFromNAS() {
+      try {
+        const res = await fetch(`${NAS_API}?action=dashboard`);
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById("bossRevenue").textContent = "NT$ " + Number(data.revenue || 0).toLocaleString();
+          document.getElementById("bossDoneCount").textContent = data.count || 0;
+        }
+      } catch (err) {
+        console.warn("Dashboard讀取失敗", err);
+      }
+    }
+
+    const defaultPriceTable = { PVC: 500, PP: 400, 合成板: 800, 店卡: 20, DM: 5, 'PVC裱合成板': 1200, '割型': 1500, '設計': 1000, '施工': 2000 };
+    const defaultPriceTables = { 一般: { ...defaultPriceTable } };
+    const defaultCategoryOptions = {
+      校園佈置: ['PVC', 'PP', '合成板'],
+      商業廣告: ['店卡', 'DM'],
+      會場佈置: ['PVC裱合成板', '割型'],
+      婚禮佈置: ['設計', '施工']
+    };
+
+    let priceTables = JSON.parse(localStorage.getItem('wumi_price_tables') || 'null') || structuredClone(defaultPriceTables);
+    let categoryOptions = JSON.parse(localStorage.getItem('wumi_category_options') || 'null') || structuredClone(defaultCategoryOptions);
+
+    const state = {
+      mode: '業務',
+      items: [],
+      quotes: JSON.parse(localStorage.getItem('wumi_quotes') || '[]'),
+      customers: JSON.parse(localStorage.getItem('wumi_customers') || '[]'),
+      pricePlan: Object.keys(priceTables)[0] || '一般'
+    };
+
+    function newItem() {
+      return { id: Date.now() + Math.random(), category: '', product: '', width: '', height: '', qty: '1', adjust: '0' };
+    }
+
+    function activePriceTable() { return priceTables[state.pricePlan] || {}; }
+    function getBase(item) {
+      const w = Number(item.width) || 0;
+      const h = Number(item.height) || 0;
+      const q = Number(item.qty) || 0;
+      const unit = activePriceTable()[item.product] || 0;
+      return w && h ? w * h * unit * q : unit * q;
+    }
+    function getAdjusted(item) {
+      const base = getBase(item);
+      const adjust = Number(item.adjust) || 0;
+      return Math.round(base * (1 + adjust / 100));
+    }
+    function totalAmount() { return state.items.reduce((sum, item) => sum + getAdjusted(item), 0); }
+
+    function saveLocal() {
+      localStorage.setItem('wumi_quotes', JSON.stringify(state.quotes));
+      localStorage.setItem('wumi_price_tables', JSON.stringify(priceTables));
+      localStorage.setItem('wumi_category_options', JSON.stringify(categoryOptions));
+      localStorage.setItem('wumi_customers', JSON.stringify(state.customers));
+    }
+
+    function normalizeHeaderKey(key) {
+      return String(key || '').replace(/[\s　]+/g, '').replace(/[：:]/g, '').trim().toLowerCase();
+    }
+    function getFirstValue(obj, keys) {
+      for (const key of keys) {
+        if (obj[key] !== undefined && obj[key] !== null && String(obj[key]).trim() !== '') {
+          return String(obj[key]).trim();
+        }
+      }
+      return '';
+    }
+    function normalizeCompareText(value) {
+      return String(value || '').replace(/[\s　]+/g, '').trim().toLowerCase();
+    }
+
+    function normalizeCustomerRow(row) {
+      const normalized = {};
+      Object.keys(row || {}).forEach(key => {
+        normalized[normalizeHeaderKey(key)] = row[key];
+      });
+      return {
+        company: getFirstValue(normalized, ['客戶名稱','公司名稱','公司','客戶','客戶名','名稱','店名','單位名稱','機構名稱']),
+        contact: getFirstValue(normalized, ['聯絡人','聯絡窗口','窗口','聯絡窗口姓名','承辦人','承辦','負責人','窗口姓名','聯絡姓名','姓名']),
+        tel: getFirstValue(normalized, ['聯絡電話','電話','市話','公司電話','電話號碼','tel','電話1','聯絡電話1']),
+        mobile: getFirstValue(normalized, ['手機','行動電話','行動','手機號碼','手機電話','mobile','cellphone','phone','行動號碼']),
+        email: getFirstValue(normalized, ['email','電子郵件','信箱','mail','e-mail','電子信箱']),
+        lineId: getFirstValue(normalized, ['line','lineid','line帳號','line帳號id','line官方帳號','line官方','line好友']),
+        address: getFirstValue(normalized, ['公司地址','地址','通訊地址','聯絡地址','公司住址','住址'])
+      };
+    }
+
+    function fillCustomerFields(customer) {
+      document.getElementById('customer').value = customer.company || '';
+      document.getElementById('contact').value = customer.contact || '';
+      document.getElementById('tel').value = customer.tel || '';
+      document.getElementById('mobile').value = customer.mobile || '';
+      document.getElementById('email').value = customer.email || '';
+      document.getElementById('lineId').value = customer.lineId || '';
+      document.getElementById('address').value = customer.address || '';
+      if (customer.pricePlan && priceTables[customer.pricePlan]) state.pricePlan = customer.pricePlan;
+    }
+
+    function pickCustomer(customer) {
+      fillCustomerFields(customer);
+      const idx = state.customers.findIndex(c => normalizeCompareText(c.company) === normalizeCompareText(customer.company));
+      if (idx > 0) {
+        const picked = state.customers.splice(idx, 1)[0];
+        state.customers.unshift(picked);
+      }
+      saveLocal();
+      renderAll();
+    }
+
+    function tryAutofillCustomer() {
+      const keyword = normalizeCompareText(document.getElementById('customer').value || '');
+      if (!keyword) return;
+      let matched = state.customers.find(c => normalizeCompareText(c.company) === keyword);
+      if (!matched) matched = state.customers.find(c => normalizeCompareText(c.company).includes(keyword));
+      if (!matched) return;
+      fillCustomerFields(matched);
+    }
+
+    function renderCustomerPicker() {
+      const wrap = document.getElementById('customerPickWrap');
+      if (!wrap) return;
+      const keyword = normalizeCompareText(document.getElementById('customerSearch')?.value || '');
+      wrap.innerHTML = '';
+      const filtered = state.customers.filter(c => {
+        if (!keyword) return true;
+        return [c.company, c.contact, c.tel, c.mobile, c.email, c.lineId, c.address]
+          .filter(Boolean)
+          .some(v => normalizeCompareText(v).includes(keyword));
+      }).slice(0, 50);
+
+      filtered.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'btn sm';
+        btn.type = 'button';
+        btn.textContent = c.company || '未命名客戶';
+        btn.addEventListener('click', () => pickCustomer(c));
+        wrap.appendChild(btn);
+      });
+    }
+
+    function renderPricePlanOptions() {
+      const select = document.getElementById('pricePlan');
+      if (!select) return;
+      select.innerHTML = Object.keys(priceTables).map(name => `<option value="${name}">${name}價格</option>`).join('');
+      if (!priceTables[state.pricePlan]) state.pricePlan = Object.keys(priceTables)[0];
+      select.value = state.pricePlan;
+    }
+
+    function renderItems() {
+      const wrap = document.getElementById('itemsWrap');
+      wrap.innerHTML = '';
+      state.items.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div class="item-head">
+            <div class="strong">明細 ${idx + 1}</div>
+            <button class="btn sm ghost" data-action="remove" type="button">刪除</button>
+          </div>
+          <div class="grid-2">
+            <select data-field="category">
+              <option value="">選擇大分類</option>
+              ${Object.keys(categoryOptions).map(c => `<option value="${c}" ${item.category===c?'selected':''}>${c}</option>`).join('')}
+            </select>
+            <select data-field="product">
+              <option value="">選擇細項</option>
+              ${(categoryOptions[item.category] || []).map(p => `<option value="${p}" ${item.product===p?'selected':''}>${p}</option>`).join('')}
+            </select>
+          </div>
+          <div class="grid-3" style="margin-top:10px;">
+            <input data-field="width" placeholder="寬" value="${item.width}">
+            <input data-field="height" placeholder="高" value="${item.height}">
+            <input data-field="qty" placeholder="數量" value="${item.qty}">
+          </div>
+          <div class="muted" style="margin-top:10px;">單價：${activePriceTable()[item.product] || 0}</div>
+          <div class="muted">小計：NT$ ${Math.round(getBase(item)).toLocaleString()}</div>
+          <input data-field="adjust" placeholder="加成 / 折扣 %（例如 10 或 -10）" value="${item.adjust}" style="margin-top:10px;">
+          <div class="row" style="margin-top:10px;">
+            <button class="btn sm" data-adjust="10" type="button">+10%</button>
+            <button class="btn sm" data-adjust="20" type="button">+20%</button>
+            <button class="btn sm" data-adjust="-10" type="button">-10%</button>
+            <button class="btn sm ghost" data-adjust="0" type="button">清除</button>
+          </div>
+          <div class="strong" style="margin-top:10px;">調整後：NT$ ${getAdjusted(item).toLocaleString()}</div>
+        `;
+        card.querySelectorAll('[data-field]').forEach(el => {
+          const handler = (e) => {
+            item[e.target.dataset.field] = e.target.value;
+            if (e.target.dataset.field === 'category') item.product = '';
+            renderAll();
+          };
+          el.addEventListener('input', handler);
+          el.addEventListener('change', handler);
+        });
+        card.querySelector('[data-action="remove"]').addEventListener('click', () => {
+          state.items = state.items.filter(x => x.id !== item.id);
+          renderAll();
+        });
+        card.querySelectorAll('[data-adjust]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            item.adjust = btn.dataset.adjust;
+            renderAll();
+          });
+        });
+        wrap.appendChild(card);
+      });
+    }
+
+    function renderPreview() {
+      document.getElementById('previewCustomer').textContent = document.getElementById('customer').value || '—';
+      document.getElementById('previewContact').textContent = document.getElementById('contact').value || '—';
+      document.getElementById('previewPricePlan').textContent = state.pricePlan || '一般';
+      document.getElementById('previewTel').textContent = document.getElementById('tel').value || '—';
+      document.getElementById('previewMobile').textContent = document.getElementById('mobile').value || '—';
+      document.getElementById('previewEmail').textContent = document.getElementById('email').value || '—';
+      document.getElementById('previewLine').textContent = document.getElementById('lineId').value || '—';
+      document.getElementById('previewAddress').textContent = document.getElementById('address').value || '—';
+      document.getElementById('previewTotal').textContent = 'NT$ ' + totalAmount().toLocaleString();
+      document.getElementById('grandTotal').textContent = '總計 NT$ ' + totalAmount().toLocaleString();
+    }
+
+    function renderBoss() {
+      const done = state.quotes.filter(q => q.status === '已成交');
+      const revenue = done.reduce((sum, q) => sum + q.total, 0);
+      document.getElementById('bossRevenue').textContent = 'NT$ ' + revenue.toLocaleString();
+      document.getElementById('bossDoneCount').textContent = done.length;
+      const wrap = document.getElementById('historyWrap');
+      wrap.innerHTML = state.quotes.length ? '' : '<div class="muted">目前沒有資料</div>';
+      state.quotes.forEach(q => {
+        const row = document.createElement('div');
+        row.className = 'history-row';
+        row.innerHTML = `<div><div class="strong">${q.customer || '未命名客戶'}</div><div class="muted">${q.pricePlan || '一般'} ｜ NT$ ${q.total.toLocaleString()}</div></div>`;
+        wrap.appendChild(row);
+      });
+    }
+
+    function renderMode() {
+      const sales = document.getElementById('salesMode');
+      const boss = document.getElementById('bossMode');
+      document.getElementById('salesModeBtn').classList.toggle('active', state.mode === '業務');
+      document.getElementById('bossModeBtn').classList.toggle('active', state.mode === '老闆');
+      sales.classList.toggle('hidden', state.mode !== '業務');
+      boss.classList.toggle('hidden', state.mode !== '老闆');
+    }
+
+    function renderAll() {
+      renderMode();
+      renderPricePlanOptions();
+      renderItems();
+      renderPreview();
+      renderBoss();
+      renderCustomerPicker();
+    }
+
+    document.getElementById('salesModeBtn').addEventListener('click', () => { state.mode = '業務'; renderAll(); });
+    document.getElementById('bossModeBtn').addEventListener('click', () => { state.mode = '老闆'; renderAll(); loadQuotesFromNAS(); loadDashboardFromNAS(); });
+    document.getElementById('pricePlan').addEventListener('change', (e) => { state.pricePlan = e.target.value; renderAll(); });
+    document.getElementById('addItemBtn').addEventListener('click', () => { state.items.push(newItem()); renderAll(); });
+
+    document.getElementById('saveQuoteBtn').addEventListener('click', () => {
+      const name = document.getElementById('customer').value.trim();
+      if (name) {
+        const existing = state.customers.find(c => normalizeCompareText(c.company) === normalizeCompareText(name));
+        const data = {
+          company: name,
+          contact: document.getElementById('contact').value,
+          tel: document.getElementById('tel').value,
+          mobile: document.getElementById('mobile').value,
+          email: document.getElementById('email').value,
+          lineId: document.getElementById('lineId').value,
+          address: document.getElementById('address').value,
+          pricePlan: state.pricePlan
+        };
+        if (existing) Object.assign(existing, data);
+        else state.customers.unshift(data);
+        saveCustomerToNAS(data);
+      }
+
+      const quoteData = {
+        id: Date.now(),
+        customer: document.getElementById('customer').value,
+        contact: document.getElementById('contact').value,
+        tel: document.getElementById('tel').value,
+        mobile: document.getElementById('mobile').value,
+        email: document.getElementById('email').value,
+        lineId: document.getElementById('lineId').value,
+        address: document.getElementById('address').value,
+        pricePlan: state.pricePlan,
+        total: totalAmount(),
+        items: state.items,
+        status: '報價中',
+        createdAt: new Date().toISOString()
+      };
+      state.quotes.unshift(quoteData);
+      saveLocal();
+      saveQuoteToNAS(quoteData);
+      saveQuoteImageToNAS();
+      alert('已儲存報價，並已同步到 NAS');
+      renderAll();
+    });
+
+    document.getElementById('updateCustomerBtn').addEventListener('click', () => {
+      const name = document.getElementById('customer').value.trim();
+      if (!name) { alert('請先輸入客戶名稱'); return; }
+      const existing = state.customers.find(c => normalizeCompareText(c.company) === normalizeCompareText(name));
+      const updatedData = {
+        company: name,
+        contact: document.getElementById('contact').value,
+        tel: document.getElementById('tel').value,
+        mobile: document.getElementById('mobile').value,
+        email: document.getElementById('email').value,
+        lineId: document.getElementById('lineId').value,
+        address: document.getElementById('address').value,
+        pricePlan: state.pricePlan
+      };
+      if (existing) Object.assign(existing, updatedData);
+      else state.customers.unshift(updatedData);
+      saveLocal();
+      saveCustomerToNAS(updatedData);
+      renderCustomerPicker();
+      alert('已更新客戶資料');
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', async () => {
+      const el = document.getElementById('quotePreview');
+      const canvas = await html2canvas(el, { backgroundColor: '#ffffff', scale: 2 });
+      const link = document.createElement('a');
+      link.download = `報價單_${document.getElementById('customer').value || '未命名客戶'}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+
+    document.getElementById('attachmentFile').addEventListener('change', async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      await uploadAttachmentToNAS(file);
+      event.target.value = '';
+    });
+
+    document.getElementById('customerFile').addEventListener('change', async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+      const imported = rows.map(normalizeCustomerRow).filter(r => r.company && normalizeCompareText(r.company));
+      if (!imported.length) { alert('沒有讀到有效客戶資料'); return; }
+      const map = new Map();
+      [...state.customers, ...imported].forEach(c => map.set(normalizeCompareText(c.company), c));
+      state.customers = Array.from(map.values());
+      saveLocal();
+      renderCustomerPicker();
+      alert(`已匯入 ${imported.length} 筆客戶資料`);
+      event.target.value = '';
+    });
+
+    ['contact', 'tel', 'mobile', 'email', 'lineId', 'address'].forEach(id => {
       document.getElementById(id).addEventListener('input', renderPreview);
+    });
+    document.getElementById('customer').addEventListener('input', () => { tryAutofillCustomer(); renderPreview(); });
+    document.getElementById('customer').addEventListener('change', () => { tryAutofillCustomer(); renderAll(); });
+    document.getElementById('customerSearch').addEventListener('input', renderCustomerPicker);
+
+    state.items = [newItem()];
+    renderAll();
+    loadCustomersFromNAS();
+    loadQuotesFromNAS();
+    loadDashboardFromNAS();
+  </script>
+</body>
+</html>
+
     });
     document.getElementById('customer').addEventListener('input', () => { tryAutofillCustomer(); renderPreview(); });
     document.getElementById('customer').addEventListener('change', () => { tryAutofillCustomer(); renderAll(); });
